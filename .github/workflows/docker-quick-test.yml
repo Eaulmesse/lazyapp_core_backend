@@ -38,6 +38,15 @@ jobs:
           docker stop quick-test-container
           docker rm quick-test-container
 
+      - name: 🔧 Setup Docker Compose
+        run: |
+          # Vérifie quelle version de Docker Compose est disponible
+          if command -v docker-compose &> /dev/null; then
+            echo "DOCKER_COMPOSE=docker-compose" >> $GITHUB_ENV
+          else
+            echo "DOCKER_COMPOSE=docker compose" >> $GITHUB_ENV
+          fi
+
       - name: ✅ Validation Docker Compose
         run: |
-          docker compose config --quiet
+          ${{ env.DOCKER_COMPOSE }} config --quiet

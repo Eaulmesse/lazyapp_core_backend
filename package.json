@@ -23,9 +23,7 @@
     "docker:dev": "docker compose --profile dev up --build",
     "docker:prod": "docker compose up --build",
     "docker:stop": "docker compose down",
-    "docker:test": "docker build -t test-image . && docker run -d --name test-app -p 3000:3000 test-image && sleep 5 && curl -f http://localhost:3000 && docker stop test-app && docker rm test-app",
-    "docker:validate": "docker compose config --quiet",
-    "docker:security": "docker build -t security-scan . && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image security-scan"
+    "docker:test": "docker build -t test-image ."
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

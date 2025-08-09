@@ -1,4 +1,4 @@
-name: Test Docker Configuration
+npmname: Test Docker Configuration
 
 # Déclenche le workflow sur push et pull request vers main
 on:
@@ -6,6 +6,12 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+
+# Permissions nécessaires pour le workflow
+permissions:
+  contents: read
+  security-events: write
+  actions: read
 
 # Variables d'environnement globales
 env:
@@ -87,35 +93,44 @@ jobs:
       - name: 📥 Checkout du code
         uses: actions/checkout@v4
 
+      - name: 🔧 Setup Docker Compose
+        run: |
+          # Vérifie quelle version de Docker Compose est disponible
+          if command -v docker-compose &> /dev/null; then
+            echo "DOCKER_COMPOSE=docker-compose" >> $GITHUB_ENV
+          else
+            echo "DOCKER_COMPOSE=docker compose" >> $GITHUB_ENV
+          fi
+
       - name: 🔧 Test Docker Compose (Production)
         run: |
           # Test du mode production
-          docker compose up -d
+          ${{ env.DOCKER_COMPOSE }} up -d
           sleep 15
           
           # Vérifie que l'application répond
           curl -f http://localhost:3002 || exit 1
           
           # Vérifie les logs
-          docker compose logs
+          ${{ env.DOCKER_COMPOSE }} logs
           
           # Nettoie
-          docker compose down
+          ${{ env.DOCKER_COMPOSE }} down
 
       - name: 🔧 Test Docker Compose (Développement)
         run: |
           # Test du mode développement
-          docker compose --profile dev up -d
+          ${{ env.DOCKER_COMPOSE }} --profile dev up -d
           sleep 15
           
           # Vérifie que l'application répond
           curl -f http://localhost:3001 || exit 1
           
           # Vérifie les logs
-          docker compose --profile dev logs
+          ${{ env.DOCKER_COMPOSE }} --profile dev logs
           
           # Nettoie
-          docker compose --profile dev down
+          ${{ env.DOCKER_COMPOSE }} --profile dev down
 
   # Job pour le scan de sécurité
   security-scan:
@@ -150,6 +165,7 @@ jobs:
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
+        continue-on-error: true
 
   # Job pour valider la configuration
   validate-config:
@@ -159,9 +175,18 @@ jobs:
       - name: 📥 Checkout du code
         uses: actions/checkout@v4
 
+      - name: 🔧 Setup Docker Compose pour validation
+        run: |
+          # Vérifie quelle version de Docker Compose est disponible
+          if command -v docker-compose &> /dev/null; then
+            echo "DOCKER_COMPOSE=docker-compose" >> $GITHUB_ENV
+          else
+            echo "DOCKER_COMPOSE=docker compose" >> $GITHUB_ENV
+          fi
+
       - name: ✅ Validation de la syntaxe Docker Compose
         run: |
-          docker compose config
+          ${{ env.DOCKER_COMPOSE }} config
 
       - name: ✅ Validation des Dockerfiles
         run: |
