@@ -1,0 +1,63 @@
+# Dépendances
+node_modules
+npm-debug.log*
+
+# Fichiers de build
+dist
+build
+*.tgz
+
+# Logs
+logs
+*.log
+
+# Coverage directory utilisé par les outils comme istanbul
+coverage
+
+# Répertoire de dépendances nyc test coverage
+.nyc_output
+
+# ESLint cache
+.eslintcache
+
+# Fichiers optionnels npm RC
+.npmrc
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.local
+
+# Répertoires IDE
+.vscode
+.idea
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Tests
+test
+**/*.spec.ts
+**/*.test.ts
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml

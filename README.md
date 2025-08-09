@@ -21,9 +21,13 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+# LazyApp Core Backend
+
+[![Docker Test](https://github.com/eaulmesse/lazyapp_core_backend/actions/workflows/docker-test.yml/badge.svg)](https://github.com/USERNAME/lazyapp_core_backend/actions/workflows/docker-test.yml)
+
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Application backend NestJS avec configuration Docker complète.
 
 ## Project setup
 
@@ -33,6 +37,7 @@ $ npm install
 
 ## Compile and run the project
 
+### Mode classique
 ```bash
 # development
 $ npm run start
@@ -43,6 +48,25 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+### Mode Docker 🐳
+```bash
+# development avec hot reload
+$ npm run docker:dev
+# → http://localhost:3001
+
+# production
+$ npm run docker:prod
+# → http://localhost:3002
+
+# tester la configuration Docker
+$ npm run docker:test
+
+# scanner la sécurité
+$ npm run docker:security
+```
+
+Pour plus de détails sur Docker, voir [README-Docker.md](./README-Docker.md)
 
 ## Run tests
 

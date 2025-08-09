@@ -17,7 +17,15 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:build": "docker build -t lazyapp-backend .",
+    "docker:run": "docker run -p 3000:3000 lazyapp-backend",
+    "docker:dev": "docker-compose --profile dev up --build",
+    "docker:prod": "docker-compose up --build",
+    "docker:stop": "docker-compose down",
+    "docker:test": "docker build -t test-image . && docker run -d --name test-app -p 3000:3000 test-image && sleep 5 && curl -f http://localhost:3000 && docker stop test-app && docker rm test-app",
+    "docker:validate": "docker-compose config --quiet",
+    "docker:security": "docker build -t security-scan . && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image security-scan"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

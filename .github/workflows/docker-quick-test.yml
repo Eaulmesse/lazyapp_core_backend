@@ -1,0 +1,43 @@
+name: Quick Docker Test
+
+# Workflow rapide pour les tests sur chaque push
+on:
+  push:
+    paths:
+      - 'Dockerfile*'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - 'package*.json'
+      - 'src/**'
+
+jobs:
+  quick-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐳 Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔧 Test Build rapide
+        run: |
+          # Build rapide sans cache pour vérifier la syntaxe
+          docker build -t quick-test .
+          
+          # Test de démarrage rapide
+          docker run -d --name quick-test-container -p 3000:3000 quick-test
+          sleep 5
+          
+          # Vérification simple
+          docker ps | grep quick-test-container
+          docker logs quick-test-container
+          
+          # Nettoyage
+          docker stop quick-test-container
+          docker rm quick-test-container
+
+      - name: ✅ Validation Docker Compose
+        run: |
+          docker-compose config --quiet
