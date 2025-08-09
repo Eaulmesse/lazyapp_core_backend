@@ -5,7 +5,8 @@ Ce guide explique comment utiliser Docker avec votre application NestJS.
 ## Prérequis
 
 - Docker installé sur votre machine
-- Docker Compose installé
+- Docker Compose V2 (commande `docker compose`) 
+  - Si vous avez l'ancienne version, utilisez `docker-compose` au lieu de `docker compose`
 
 ## Fichiers Docker
 
@@ -51,16 +52,16 @@ npm run docker:stop
 
 ```bash
 # Développement
-docker-compose --profile dev up --build
+docker compose --profile dev up --build
 
 # Production
-docker-compose up --build
+docker compose up --build
 
 # Arrêter
-docker-compose down
+docker compose down
 
 # Voir les logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ## Structure des services

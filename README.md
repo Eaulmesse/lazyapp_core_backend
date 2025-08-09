@@ -23,7 +23,7 @@
 
 # LazyApp Core Backend
 
-[![Docker Test](https://github.com/eaulmesse/lazyapp_core_backend/actions/workflows/docker-test.yml/badge.svg)](https://github.com/USERNAME/lazyapp_core_backend/actions/workflows/docker-test.yml)
+[![Docker Test](https://github.com/eaulmesse/lazyapp_core_backend/actions/workflows/docker-test.yml/badge.svg)](https://github.com/eaulmesse/lazyapp_core_backend/actions/workflows/docker-test.yml)
 
 ## Description
 

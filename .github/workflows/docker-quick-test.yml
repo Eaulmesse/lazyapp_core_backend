@@ -40,4 +40,4 @@ jobs:
 
       - name: ✅ Validation Docker Compose
         run: |
-          docker-compose config --quiet
+          docker compose config --quiet

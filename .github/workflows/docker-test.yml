@@ -90,32 +90,32 @@ jobs:
       - name: 🔧 Test Docker Compose (Production)
         run: |
           # Test du mode production
-          docker-compose up -d
+          docker compose up -d
           sleep 15
           
           # Vérifie que l'application répond
           curl -f http://localhost:3002 || exit 1
           
           # Vérifie les logs
-          docker-compose logs
+          docker compose logs
           
           # Nettoie
-          docker-compose down
+          docker compose down
 
       - name: 🔧 Test Docker Compose (Développement)
         run: |
           # Test du mode développement
-          docker-compose --profile dev up -d
+          docker compose --profile dev up -d
           sleep 15
           
           # Vérifie que l'application répond
           curl -f http://localhost:3001 || exit 1
           
           # Vérifie les logs
-          docker-compose --profile dev logs
+          docker compose --profile dev logs
           
           # Nettoie
-          docker-compose --profile dev down
+          docker compose --profile dev down
 
   # Job pour le scan de sécurité
   security-scan:
@@ -161,7 +161,7 @@ jobs:
 
       - name: ✅ Validation de la syntaxe Docker Compose
         run: |
-          docker-compose config
+          docker compose config
 
       - name: ✅ Validation des Dockerfiles
         run: |
