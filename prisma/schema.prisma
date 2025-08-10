@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  password          String
+  firstname         String
+  lastname          String
+  email_verified_at DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  sites             Site[]
+  audits            Audit[]
+}
+
+model Site {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  name        String
+  url         String    @unique
+  description String?
+  last_audit  DateTime?
+  created_at  DateTime  @default(now())
+  
+  // Relations
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  audits      Audit[]
+  
+  @@index([user_id])
+}
+
+model Audit {
+  id            Int      @id @default(autoincrement())
+  user_id       Int
+  site_id       Int
+  overall_score Float    // Lighthouse scores sont en float (0-100)
+  raw_data      Json     // Données complètes de Lighthouse
+  llm_analysis  Json?    // Analyse par LLM
+  created_at    DateTime @default(now())
+  
+  // Relations
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  site          Site     @relation(fields: [site_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@index([site_id])
+  @@index([created_at])
+}
