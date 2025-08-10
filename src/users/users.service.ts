@@ -4,6 +4,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
+export type User = any;
+
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -37,6 +39,20 @@ export class UsersService {
         created_at: true,
         updated_at: true,
         // Pas de password dans la réponse
+      },
+    });
+  }
+
+  async findOneByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        firstname: true,
+        lastname: true,
+        email_verified_at: true,
+        password: true,
       },
     });
   }

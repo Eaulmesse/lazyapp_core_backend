@@ -8,51 +8,59 @@ export class AuditsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createAuditDto: CreateAuditDto) {
-    // On suppose que le champ unique est 'id', pas 'site_id'
-    const existingAudit = await this.prisma.audit.findFirst({
-      where: { site_id: createAuditDto.site_id },
-    });
+    // Calculer overall_score basé sur raw_data (exemple simple)
+    const calculateOverallScore = (rawData: any): number => {
+      if (rawData.performance && rawData.accessibility && rawData.best_practices && rawData.seo) {
+        return (rawData.performance + rawData.accessibility + rawData.best_practices + rawData.seo) / 4;
+      }
+      return 0;
+    };
 
-    if (existingAudit) {
-      throw new ConflictException('Un audit pour ce site existe déjà');
-    }
+    const overall_score = calculateOverallScore(createAuditDto.raw_data);
 
     return this.prisma.audit.create({
       data: {
         ...createAuditDto,
+        overall_score,
         created_at: new Date(),
       },
-      select: {
-        id: true,
-        overall_score: true,
-        raw_data: true,
-        created_at: true,
-      }
-    })
+      include: {
+        user: {
+          select: { id: true, email: true, firstname: true, lastname: true }
+        },
+        site: {
+          select: { id: true, name: true, url: true }
+        },
+      },
+    });
   }
 
   findAll() {
     return this.prisma.audit.findMany({
-      select: {
-        id: true,
-        overall_score: true,
-        raw_data: true,
-        created_at: true,
+      include: {
+        user: {
+          select: { id: true, email: true, firstname: true, lastname: true }
+        },
+        site: {
+          select: { id: true, name: true, url: true }
+        },
       },
       orderBy: { created_at: 'desc' },
-    }) ;
+    });
   }
 
-  findOne(id: number) {
-    const audit = this.prisma.audit.findUnique({
+  async findOne(id: number) {
+    const audit = await this.prisma.audit.findUnique({
       where: { id },
-      select: {
-        id: true,
-        overall_score: true,
-        raw_data: true,
-        created_at: true,
-      }
-    })
+      include: {
+        user: {
+          select: { id: true, email: true, firstname: true, lastname: true }
+        },
+        site: {
+          select: { id: true, name: true, url: true }
+        },
+      },
+    });
 
     if (!audit) {
       throw new NotFoundException(`Audit avec l'ID ${id} non trouvé`);
@@ -64,18 +72,30 @@ export class AuditsService {
   async update(id: number, updateAuditDto: UpdateAuditDto) {
     await this.findOne(id);
 
+    // Recalculer overall_score si raw_data est mis à jour
+    const updateData: any = { ...updateAuditDto };
+    if (updateAuditDto.raw_data) {
+      const calculateOverallScore = (rawData: any): number => {
+        if (rawData.performance && rawData.accessibility && rawData.best_practices && rawData.seo) {
+          return (rawData.performance + rawData.accessibility + rawData.best_practices + rawData.seo) / 4;
+        }
+        return 0;
+      };
+      updateData.overall_score = calculateOverallScore(updateAuditDto.raw_data);
+    }
+
     return this.prisma.audit.update({
       where: { id },
-      data: {
-        ...updateAuditDto,
+      data: updateData,
+      include: {
+        user: {
+          select: { id: true, email: true, firstname: true, lastname: true }
+        },
+        site: {
+          select: { id: true, name: true, url: true }
+        },
       },
-      select: {
-        id: true,
-        overall_score: true,
-        raw_data: true,
-        created_at: true,
-      }
-    })
+    });
   }
 
   async remove(id: number) {
