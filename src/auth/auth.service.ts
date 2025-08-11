@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -31,5 +32,29 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async register(registerDto: RegisterDto) {
+    const { email, password, firstName, lastName, confirmPassword } = registerDto;
+
+    if (password !== confirmPassword) {
+      throw new Error('Les mots de passe ne correspondent pas.');
+    }
+
+    if (!firstName || !lastName) {
+      throw new Error('Le prénom et le nom sont requis pour l\'enregistrement.');
+    }
+
+    // Hachage du mot de passe avant la création de l'utilisateur
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const createUserDto = {
+      email,
+      password: hashedPassword,
+      firstname: firstName,
+      lastname: lastName,
+    };
+
+    return this.usersService.create(createUserDto);
   }
 }

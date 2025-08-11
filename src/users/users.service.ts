@@ -20,13 +20,16 @@ export class UsersService {
       throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
 
-    // Hash du mot de passe
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 12);
+    // Ne pas hasher à nouveau si le mot de passe semble déjà être haché
+    // (Cette vérification simpliste est basée sur la longueur typique d'un hash bcrypt)
+    const password = createUserDto.password.length >= 60 
+      ? createUserDto.password 
+      : await bcrypt.hash(createUserDto.password, 12);
 
     return this.prisma.user.create({
       data: {
         ...createUserDto,
-        password: hashedPassword,
+        password: password,
         created_at: new Date(),
         updated_at: new Date(),
       },
