@@ -7,10 +7,11 @@ import { SiteModule } from './site/site.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { CsrfMiddleware } from './common/middleware/csrf.middleware';
+import { SubscriptionModule } from './subscription/subscription.module';
 import cookieParser from 'cookie-parser';
 
 @Module({
-  imports: [PrismaModule, AuditsModule, UsersModule, SiteModule, AuthModule],
+  imports: [PrismaModule, AuditsModule, UsersModule, SiteModule, AuthModule, SubscriptionModule],
   providers: [AppService],
   controllers: [AppController],
 })
