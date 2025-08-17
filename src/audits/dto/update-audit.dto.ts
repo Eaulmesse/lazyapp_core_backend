@@ -1,8 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/swagger';
 import { CreateAuditDto } from './create-audit.dto';
 
-export class UpdateAuditDto extends PartialType(CreateAuditDto) {
-    overall_score: number;
-    raw_data: string;
-    
-}
+export class UpdateAuditDto extends PartialType(CreateAuditDto) {}

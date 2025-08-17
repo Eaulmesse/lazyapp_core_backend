@@ -19,6 +19,7 @@ model User {
   updated_at        DateTime  @updatedAt
   audits            Audit[]
   sites             Site[]
+  subscriptions     Subscription[]
 }
 
 model Site {
@@ -36,19 +37,60 @@ model Site {
 }
 
 model Audit {
-  id            Int      @id @default(autoincrement())
-  user_id       Int
-  site_id       Int
-  overall_score Float
-  raw_data      Json
-  llm_analysis  Json?
-  created_at    DateTime @default(now())
-  site          Site     @relation(fields: [site_id], references: [id], onDelete: Cascade)
-  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id                    Int                    @id @default(autoincrement())
+  user_id               Int
+  site_id               Int
+  status                String                 @default("pending") // 'pending', 'running', 'completed', 'failed'
+  lighthouse_score      Float?
+  lighthouse_data       Json?                  // Données brutes de Lighthouse
+  agent_analysis        AgentAnalysis?         // Relation one-to-one avec l'analyse d'agent
+  overall_score         Float?
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @updatedAt
+  completed_at          DateTime?
+  
+  site                  Site                   @relation(fields: [site_id], references: [id], onDelete: Cascade)
+  user                  User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
   @@index([site_id])
+  @@index([status])
   @@index([created_at])
+}
+
+model AgentAnalysis {
+  id                    Int      @id @default(autoincrement())
+  audit_id              Int      @unique       // Relation one-to-one avec Audit
+  agent_version         String
+  analysis_data         Json     // Rapport complet de l'agent
+  recommendations       Json     // Recommandations spécifiques
+  priority_issues       Json?    // Problèmes prioritaires
+  improvement_score     Float?   // Score d'amélioration suggéré
+  processing_time       Int?     // Temps de traitement en ms
+  created_at            DateTime @default(now())
+  
+  audit                 Audit    @relation(fields: [audit_id], references: [id], onDelete: Cascade)
+  
+  @@index([audit_id])
+  @@index([created_at])
+}
+
+model Plan {
+  id                Int            @id @default(autoincrement())
+  name              String         @unique
+  description       String?
+  price             Float
+  currency          String         @default("EUR")
+  duration_months   Int
+  max_audits_per_month Int
+  features          Json?
+  is_active         Boolean        @default(true)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  
+  subscriptions     Subscription[]
+  
+  @@index([is_active])
 }
 
 model Subscription {
@@ -64,8 +106,10 @@ model Subscription {
   updated_at           DateTime @updatedAt
   
   user                 User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  plan                 Plan     @relation(fields: [plan_id], references: [id], onDelete: Cascade)
   
   @@index([user_id])
+  @@index([plan_id])
   @@index([status])
   @@index([end_date])
 }
